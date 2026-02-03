@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">WeatherAppAndroidCompose</string>
+
+    <string name="bottom_nav_current">Current Weather</string>
+    <string name="bottom_nav_list">Weather List</string>
 </resources>
