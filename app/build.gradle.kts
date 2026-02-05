@@ -72,4 +72,12 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+
+    // Retrofit
+    implementation(libs.squareup.retrofit2.retrofit)
+    implementation(libs.squareup.retrofit2.converter.gson)
+    // OkHttp
+    implementation(libs.squareup.okhttp3.logging.interceptor)
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
 }
