@@ -18,3 +18,6 @@ val Peach80 = Color(0xFFFFD4B8)
 val Orange40 = Color(0xFFFF6F00)
 val OrangeGrey40 = Color(0xFFBF8040)
 val Peach40 = Color(0xFFD97040)
+
+val White = Color(0xFFFFFFFF)
+val Black = Color(0xFF000000)
