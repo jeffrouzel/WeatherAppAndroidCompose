@@ -80,4 +80,6 @@ dependencies {
     implementation(libs.squareup.okhttp3.logging.interceptor)
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
 }
