@@ -1,6 +1,5 @@
 package com.example.weatherappandroidcompose.screens
 
-
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.weatherappandroidcompose.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,6 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.weatherappandroidcompose.R
 import com.example.weatherappandroidcompose.ui.theme.WeatherAppAndroidComposeTheme
 import com.example.weatherappandroidcompose.ui.theme.mainscreenBackgroundModifier
 
@@ -78,23 +77,11 @@ fun MainScreen() {
 
 @Composable
 fun CurrentWeatherScreen() {
-    // Replace TODO() with actual UI
     Box(
         modifier = mainscreenBackgroundModifier(),
         contentAlignment = Alignment.Center
     ) {
         Text("Current Weather Screen")
-    }
-}
-
-@Composable
-fun WeatherListScreen() {
-    // Replace TODO() with actual UI
-    Box(
-        modifier = mainscreenBackgroundModifier(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Weather List Screen")
     }
 }
 
@@ -152,7 +139,7 @@ private fun BottomNavBar(
             },
             selected = currentRoute == "weather_list",
             onClick = onListClick,
-            colors = NavigationBarItemDefaults.colors(  // ← Add this
+            colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.onPrimary,
                 selectedTextColor = MaterialTheme.colorScheme.onPrimary,
                 unselectedIconColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
