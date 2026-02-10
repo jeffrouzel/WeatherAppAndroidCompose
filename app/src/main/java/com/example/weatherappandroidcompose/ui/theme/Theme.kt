@@ -1,6 +1,5 @@
 package com.example.weatherappandroidcompose.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -14,13 +13,26 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColorScheme = darkColorScheme(
     primary = Orange80,
     secondary = OrangeGrey80,
-    tertiary = Peach80
+    tertiary = Peach80,
+    surface = DarkSurface,
+    surfaceVariant = DarkSurfaceVariant,
+    background = DarkBackground,
+    onPrimary = Black,
+    primaryContainer = Orange40,
+    onPrimaryContainer = White,
+
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Orange40,
     secondary = OrangeGrey40,
-    tertiary = Peach40
+    tertiary = Peach40,
+    surface = LightSurface,
+    surfaceVariant = LightSurfaceVariant,
+    background = LightBackground,
+    onPrimary = White,
+    primaryContainer = Orange80,
+    onPrimaryContainer = Black,
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -37,7 +49,7 @@ private val LightColorScheme = lightColorScheme(
 fun WeatherAppAndroidComposeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

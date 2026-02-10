@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherappandroidcompose.R
 import com.example.weatherappandroidcompose.ui.theme.landingButtonModifier
@@ -22,9 +21,8 @@ import com.example.weatherappandroidcompose.ui.theme.landingTextTextStyle
 import com.example.weatherappandroidcompose.ui.theme.landingTitleHalfOne
 import com.example.weatherappandroidcompose.ui.theme.landingTitleHalfTwo
 
-@Preview(showBackground = true)
 @Composable
-fun LandingScreen(modifier: Modifier = Modifier){
+fun LandingScreen(onGetStarted: () -> Unit, modifier: Modifier = Modifier){
     Column (
         modifier = landingColumnModifier,
         verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
@@ -38,7 +36,7 @@ fun LandingScreen(modifier: Modifier = Modifier){
             contentScale = ContentScale.Crop
         )
         AppTitleLanding()
-        Button(onClick = { /*TODO*/ }, modifier = landingButtonModifier) {
+        Button(onClick = onGetStarted, modifier = landingButtonModifier) {
             Text("Open", style = landingButtonTextStyle)
         }
     }
