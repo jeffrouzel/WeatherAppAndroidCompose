@@ -17,7 +17,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -27,14 +30,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.weatherappandroidcompose.api.NetworkResponse
+import com.example.weatherappandroidcompose.api.WeatherModel
 import com.example.weatherappandroidcompose.data.MockWeatherData
 import com.example.weatherappandroidcompose.data.WeatherCity
 import com.example.weatherappandroidcompose.ui.theme.WeatherAppAndroidComposeTheme
 import com.example.weatherappandroidcompose.ui.theme.mainscreenBackgroundModifier
 
 @Composable
-fun WeatherListScreen() {
-    var searchQuery by rememberSaveable() { mutableStateOf("") }
+fun WeatherListScreen(viewModel: WeatherViewModel) {
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    val weatherData by viewModel.weatherData.observeAsState()
+
+    val weatherList = rememberSaveable { mutableStateListOf<WeatherModel>() }
+
+    LaunchedEffect(weatherData) {
+        if (weatherData is NetworkResponse.Success) {
+            val weather = (weatherData as NetworkResponse.Success).data
+            // Check if city already exists in list, if not add it
+            if (weatherList.none { it.name == weather.name && it.sys.country == weather.sys.country }) {
+                weatherList.add(0, weather) // Add to beginning of list
+            }
+        }
+    }
+
 
     // Filter cities based on search query
     val filteredCities = rememberSaveable(searchQuery) {
@@ -202,6 +222,6 @@ private fun WeatherCityCardPreview() {
 @Composable
 private fun WeatherListScreenPreview() {
     WeatherAppAndroidComposeTheme {
-        WeatherListScreen()
+        WeatherListScreen(viewModel = viewModel())
     }
 }

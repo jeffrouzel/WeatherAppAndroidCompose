@@ -18,7 +18,7 @@ object MockWeatherData {
             cityName = "Manila",
             country = "Philippines",
             temperature = 32,
-            condition = "Sunny",
+            condition = "☀\uFE0F Sunny",
             humidity = 75,
             windSpeed = 15
         ),
@@ -27,7 +27,7 @@ object MockWeatherData {
             cityName = "Cebu",
             country = "Philippines",
             temperature = 30,
-            condition = "Partly Cloudy",
+            condition = "☁\uFE0F Partly Cloudy",
             humidity = 70,
             windSpeed = 12
         ),
@@ -36,7 +36,7 @@ object MockWeatherData {
             cityName = "Davao",
             country = "Philippines",
             temperature = 31,
-            condition = "Rainy",
+            condition = "\uD83C\uDF27\uFE0F Rainy",
             humidity = 85,
             windSpeed = 20
         ),

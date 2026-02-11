@@ -67,6 +67,7 @@ dependencies {
 
     // View Model
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.compose.runtime.livedata)
 
     // Hilt
     implementation(libs.hilt.android)
