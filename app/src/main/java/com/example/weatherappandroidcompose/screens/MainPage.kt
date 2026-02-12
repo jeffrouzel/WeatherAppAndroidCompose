@@ -1,6 +1,5 @@
 package com.example.weatherappandroidcompose.screens
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -27,7 +26,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.weatherappandroidcompose.R
 import com.example.weatherappandroidcompose.ui.theme.WeatherAppAndroidComposeTheme
-import com.example.weatherappandroidcompose.ui.theme.mainscreenBackgroundModifier
 
 @Composable
 fun MainScreen() {
@@ -72,16 +70,6 @@ fun MainScreen() {
                 WeatherListScreen()
             }
         }
-    }
-}
-
-@Composable
-fun CurrentWeatherScreen() {
-    Box(
-        modifier = mainscreenBackgroundModifier(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Current Weather Screen")
     }
 }
 

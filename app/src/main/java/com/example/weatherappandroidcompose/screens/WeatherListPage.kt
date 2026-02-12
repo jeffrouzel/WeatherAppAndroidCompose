@@ -151,8 +151,12 @@ fun WeatherCityCard(city: WeatherCity) {
                     value = "${city.humidity}%"
                 )
                 WeatherInfoItem(
-                    label = "Wind",
-                    value = "${city.windSpeed} km/h"
+                    label = "Sunrise",
+                    value = "${city.sunrise} am"
+                )
+                WeatherInfoItem(
+                    label = "Sunset",
+                    value = "${city.sunset} pm"
                 )
             }
         }
@@ -192,7 +196,8 @@ private fun WeatherCityCardPreview() {
                 temperature = 32,
                 condition = "Sunny",
                 humidity = 75,
-                windSpeed = 15
+                sunrise = "5:00",
+                sunset = "6:00"
             )
         )
     }

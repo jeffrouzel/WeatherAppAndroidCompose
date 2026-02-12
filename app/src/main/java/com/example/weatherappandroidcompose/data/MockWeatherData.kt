@@ -7,7 +7,8 @@ data class WeatherCity(
     val temperature: Int,
     val condition: String,
     val humidity: Int,
-    val windSpeed: Int
+    val sunrise: String,
+    val sunset: String
 )
 
 // Mock data for testing
@@ -20,7 +21,8 @@ object MockWeatherData {
             temperature = 32,
             condition = "Sunny",
             humidity = 75,
-            windSpeed = 15
+            sunrise = "5:00",
+            sunset = "6:00"
         ),
         WeatherCity(
             id = 2,
@@ -29,7 +31,8 @@ object MockWeatherData {
             temperature = 30,
             condition = "Partly Cloudy",
             humidity = 70,
-            windSpeed = 12
+            sunrise = "5:00",
+            sunset = "6:00"
         ),
         WeatherCity(
             id = 3,
@@ -38,7 +41,8 @@ object MockWeatherData {
             temperature = 31,
             condition = "Rainy",
             humidity = 85,
-            windSpeed = 20
+            sunrise = "5:00",
+            sunset = "6:00"
         ),
         WeatherCity(
             id = 4,
@@ -47,7 +51,8 @@ object MockWeatherData {
             temperature = 22,
             condition = "Cloudy",
             humidity = 60,
-            windSpeed = 10
+            sunrise = "5:00",
+            sunset = "6:00"
         ),
         WeatherCity(
             id = 5,
@@ -56,7 +61,8 @@ object MockWeatherData {
             temperature = 18,
             condition = "Clear",
             humidity = 55,
-            windSpeed = 8
+            sunrise = "5:00",
+            sunset = "6:00"
         ),
         WeatherCity(
             id = 6,
@@ -65,7 +71,8 @@ object MockWeatherData {
             temperature = 33,
             condition = "Thunderstorm",
             humidity = 90,
-            windSpeed = 25
+            sunrise = "5:00",
+            sunset = "6:00"
         ),
         WeatherCity(
             id = 7,
@@ -74,7 +81,8 @@ object MockWeatherData {
             temperature = 34,
             condition = "Hot",
             humidity = 80,
-            windSpeed = 5
+            sunrise = "5:00",
+            sunset = "6:00"
         ),
         WeatherCity(
             id = 8,
@@ -83,7 +91,8 @@ object MockWeatherData {
             temperature = 28,
             condition = "Foggy",
             humidity = 78,
-            windSpeed = 14
+            sunrise = "5:00",
+            sunset = "6:00"
         ),
         WeatherCity(
             id = 9,
@@ -92,7 +101,8 @@ object MockWeatherData {
             temperature = 20,
             condition = "Cool",
             humidity = 88,
-            windSpeed = 18
+            sunrise = "5:00",
+            sunset = "6:00"
         ),
         WeatherCity(
             id = 10,
@@ -101,7 +111,8 @@ object MockWeatherData {
             temperature = 31,
             condition = "Sunny",
             humidity = 72,
-            windSpeed = 16
+            sunrise = "5:00",
+            sunset = "6:00"
         )
     )
 }
