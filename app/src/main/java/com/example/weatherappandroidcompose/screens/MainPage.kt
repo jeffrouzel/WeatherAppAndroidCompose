@@ -15,6 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.weatherappandroidcompose.R
+import com.example.weatherappandroidcompose.data.MockWeatherData
 import com.example.weatherappandroidcompose.ui.theme.WeatherAppAndroidComposeTheme
 
 @Composable
@@ -32,6 +36,11 @@ fun MainScreen() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    // State management for weather data
+    val weatherCities = MockWeatherData.cities
+    var selectedCityId by rememberSaveable { mutableStateOf(weatherCities.firstOrNull()?.id) }
+    val selectedCity = weatherCities.find { it.id == selectedCityId }
 
     Scaffold(
         bottomBar = {
@@ -64,10 +73,24 @@ fun MainScreen() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("current_weather") {
-                CurrentWeatherScreen()
+                CurrentWeatherScreen(
+                    selectedCity = selectedCity
+                )
             }
             composable("weather_list") {
-                WeatherListScreen()
+                WeatherListScreen(
+                    cities = weatherCities,
+                    onCitySelected = { city ->
+                        selectedCityId = city.id
+                        navController.navigate("current_weather") {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
         }
     }

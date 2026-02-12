@@ -1,5 +1,6 @@
 package com.example.weatherappandroidcompose.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,15 +34,18 @@ import com.example.weatherappandroidcompose.ui.theme.WeatherAppAndroidComposeThe
 import com.example.weatherappandroidcompose.ui.theme.mainscreenBackgroundModifier
 
 @Composable
-fun WeatherListScreen() {
-    var searchQuery by rememberSaveable() { mutableStateOf("") }
+fun WeatherListScreen(
+    cities: List<WeatherCity>,
+    onCitySelected: (WeatherCity) -> Unit = {}
+) {
+    var searchQuery by rememberSaveable { mutableStateOf("") }
 
     // Filter cities based on search query
-    val filteredCities = rememberSaveable(searchQuery) {
+    val filteredCities = rememberSaveable(searchQuery, cities) {
         if (searchQuery.isEmpty()) {
-            MockWeatherData.cities
+            cities
         } else {
-            MockWeatherData.cities.filter { city ->
+            cities.filter { city ->
                 city.cityName.contains(searchQuery, ignoreCase = true) ||
                         city.country.contains(searchQuery, ignoreCase = true)
             }
@@ -74,7 +78,10 @@ fun WeatherListScreen() {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(filteredCities) { city ->
-                    WeatherCityCard(city = city)
+                    WeatherCityCard(
+                        city = city,
+                        onClick = { onCitySelected(city) }
+                    )
                 }
             }
         }
@@ -82,9 +89,14 @@ fun WeatherListScreen() {
 }
 
 @Composable
-fun WeatherCityCard(city: WeatherCity) {
+fun WeatherCityCard(
+    city: WeatherCity,
+    onClick: () -> Unit = {}
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -207,6 +219,8 @@ private fun WeatherCityCardPreview() {
 @Composable
 private fun WeatherListScreenPreview() {
     WeatherAppAndroidComposeTheme {
-        WeatherListScreen()
+        WeatherListScreen(
+            cities = MockWeatherData.cities
+        )
     }
 }
