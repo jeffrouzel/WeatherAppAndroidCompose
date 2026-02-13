@@ -3,4 +3,5 @@
 
     <string name="bottom_nav_current">Current Weather</string>
     <string name="bottom_nav_list">Weather List</string>
+    <string name="placeholder_search">Searching...</string>
 </resources>

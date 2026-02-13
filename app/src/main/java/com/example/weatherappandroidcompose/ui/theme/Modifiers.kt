@@ -30,3 +30,4 @@ val landingButtonModifier = Modifier
 fun mainscreenBackgroundModifier(): Modifier  = Modifier
     .fillMaxSize()
     .background(MaterialTheme.colorScheme.background)
+    .padding(16.dp)
