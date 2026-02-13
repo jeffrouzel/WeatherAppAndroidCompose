@@ -5,31 +5,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.weatherappandroidcompose.R
-import com.example.weatherappandroidcompose.data.MockWeatherData
-import com.example.weatherappandroidcompose.ui.theme.WeatherAppAndroidComposeTheme
+import com.example.weatherappandroidcompose.viewmodel.WeatherViewModel
 
 @Composable
 fun MainScreen() {
@@ -37,10 +26,15 @@ fun MainScreen() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // State management for weather data
-    val weatherCities = MockWeatherData.cities
-    var selectedCityId by rememberSaveable { mutableStateOf(weatherCities.firstOrNull()?.id) }
-    val selectedCity = weatherCities.find { it.id == selectedCityId }
+    val viewModel: WeatherViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+
+    var searchedCities by rememberSaveable { mutableStateOf<List<String>>(listOf("Manila")) }
+    var selectedCity by rememberSaveable { mutableStateOf("Manila") }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchWeatherByCity("Manila")
+    }
 
     Scaffold(
         bottomBar = {
@@ -74,14 +68,24 @@ fun MainScreen() {
         ) {
             composable("current_weather") {
                 CurrentWeatherScreen(
+                    uiState = uiState,
                     selectedCity = selectedCity
                 )
             }
             composable("weather_list") {
                 WeatherListScreen(
-                    cities = weatherCities,
+                    uiState = uiState,
+                    searchedCities = searchedCities,
+                    onSearch = { city ->
+                        viewModel.fetchWeatherByCity(city)
+                        if (!searchedCities.contains(city)) {
+                            searchedCities = searchedCities + city
+                        }
+                        selectedCity = city
+                    },
                     onCitySelected = { city ->
-                        selectedCityId = city.id
+                        selectedCity = city
+                        viewModel.fetchWeatherByCity(city)
                         navController.navigate("current_weather") {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
@@ -107,7 +111,6 @@ private fun BottomNavBar(
         containerColor = MaterialTheme.colorScheme.primary,
         modifier = modifier
     ) {
-        // Current Weather
         NavigationBarItem(
             icon = {
                 Icon(
@@ -129,7 +132,6 @@ private fun BottomNavBar(
             )
         )
 
-        // Divider
         VerticalDivider(
             modifier = Modifier
                 .height(36.dp)
@@ -137,7 +139,7 @@ private fun BottomNavBar(
             thickness = 2.dp,
             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.3f)
         )
-        // Weather List
+
         NavigationBarItem(
             icon = {
                 Icon(
@@ -157,18 +159,6 @@ private fun BottomNavBar(
                 unselectedTextColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
                 indicatorColor = MaterialTheme.colorScheme.primaryContainer
             )
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun BottomNavBarPreview() {
-    WeatherAppAndroidComposeTheme {
-        BottomNavBar(
-            currentRoute = "current_weather",
-            onCurrentClick = {},
-            onListClick = {}
         )
     }
 }
