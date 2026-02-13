@@ -77,13 +77,10 @@ fun MainScreen() {
                     uiState = uiState,
                     searchedCities = searchedCities,
                     onSearch = { city ->
-                        if (!searchedCities.contains(city)) {
-                            searchedCities = searchedCities + city
-                        }
                         selectedCity = city
                     },
                     onCitySelected = { city ->
-                        // Add city to search history if not already present
+                        // Add city to search history if clicked
                         if (!searchedCities.contains(city)) {
                             searchedCities = searchedCities + city
                         }

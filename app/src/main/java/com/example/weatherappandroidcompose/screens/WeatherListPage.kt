@@ -43,7 +43,7 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 // Popular cities to show before any search
-private val popularCities = listOf("Tokyo", "Singapore", "Seoul", "Bangkok", "Hong Kong")
+private val popularCities = listOf("Tokyo", "New York", "Seoul", "Bangkok", "Hong Kong")
 
 @Composable
 fun WeatherListScreen(
@@ -276,18 +276,25 @@ private fun ErrorContent(message: String) {
     }
 }
 
+////////////////////// RESULT CARD
 @Composable
 private fun WeatherResultCard(
     weather: OpenWeatherResponse,
     onClick: () -> Unit
 ) {
+    val isDay = isDaytime(weather)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = if (isDay) {
+                MaterialTheme.colorScheme.surfaceVariant
+            } else {
+                MaterialTheme.colorScheme.onBackground
+            }
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
@@ -309,12 +316,20 @@ private fun WeatherResultCard(
                         text = weather.name,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = if (isDay){
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        } else{
+                            MaterialTheme.colorScheme.onPrimary
+                        }
                     )
                     Text(
                         text = weather.sys.country,
                         fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        color = if (isDay){
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        } else{
+                            MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+                        }
                     )
                 }
 
@@ -329,27 +344,36 @@ private fun WeatherResultCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-
-            Row(horizontalArrangement = Arrangement.SpaceBetween){
-                val weatherIcon = getWeatherIcon(weather.weather.firstOrNull()?.main ?: "Clear")
+            // CONDITION W/ ICON
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val weatherIcon = getWeatherIcon(
+                    weather.weather.firstOrNull()?.main ?: "Clear",
+                    isDay
+                )
                 Icon(
                     imageVector = weatherIcon,
                     contentDescription = "Weather condition",
-                    modifier = Modifier
-                        .size(32.dp)
-                        .padding(8.dp),
+                    modifier = Modifier.size(32.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
 
+                Spacer(modifier = Modifier.size(8.dp))
 
-                // Weather Condition
                 Text(
                     text = weather.weather.firstOrNull()?.description?.replaceFirstChar {
                         if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
                     } ?: "Unknown",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (isDay){
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    } else{
+                        MaterialTheme.colorScheme.onPrimary
+                    }
                 )
             }
 
@@ -362,18 +386,48 @@ private fun WeatherResultCard(
             ) {
                 WeatherInfoItem(
                     label = "Humidity",
-                    value = "${weather.main.humidity}%"
+                    value = "${weather.main.humidity}%",
+                    isDay = isDay
                 )
                 WeatherInfoItem(
                     label = "Sunrise",
-                    value = formatTime(weather.sys.sunrise, weather.timezone)
+                    value = formatTime(weather.sys.sunrise, weather.timezone),
+                    isDay = isDay
                 )
                 WeatherInfoItem(
                     label = "Sunset",
-                    value = formatTime(weather.sys.sunset, weather.timezone)
+                    value = formatTime(weather.sys.sunset, weather.timezone),
+                    isDay = isDay
                 )
             }
         }
+    }
+}
+// ADDITIONAL INFO PART
+@Composable
+private fun WeatherInfoItem(label: String, value: String, isDay: Boolean) {
+    Column(
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = if (isDay){
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            } else{
+                MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+            }
+        )
+        Text(
+            text = value,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = if (isDay){
+                MaterialTheme.colorScheme.onSurfaceVariant
+            } else{
+                MaterialTheme.colorScheme.onPrimary
+            }
+        )
     }
 }
 
@@ -413,25 +467,6 @@ private fun CityHistoryItem(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
-    }
-}
-
-@Composable
-private fun WeatherInfoItem(label: String, value: String) {
-    Column(
-        horizontalAlignment = Alignment.Start
-    ) {
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-        )
-        Text(
-            text = value,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 ////////////////////////////////////////////// Previews //////////////////////////////////////////////

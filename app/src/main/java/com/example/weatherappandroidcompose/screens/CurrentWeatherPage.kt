@@ -106,6 +106,8 @@ private fun ErrorState(message: String) {
 
 @Composable
 private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
+    val isDay = isDaytime(weather)
+
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -115,7 +117,7 @@ private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // Location Info
+        // LOCATION
         item {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -134,9 +136,11 @@ private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
             }
         }
 
-        // Weather Icon (dynamic based on condition)
+        // WEATHER ICON
         item {
-            val weatherIcon = getWeatherIcon(weather.weather.firstOrNull()?.main ?: "Clear")
+            val weatherIcon = getWeatherIcon(
+                weather.weather.firstOrNull()?.main ?: "Clear",
+                isDay)
             Icon(
                 imageVector = weatherIcon,
                 contentDescription = "Weather condition",
@@ -145,7 +149,7 @@ private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
             )
         }
 
-        // Temperature (Convert from Kelvin to Celsius)
+        // TEMPERATURE (Convert from Kelvin to Celsius)
         item {
             val tempCelsius = (weather.main.temp - 273.15).roundToInt()
             Text(
@@ -156,7 +160,7 @@ private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
             )
         }
 
-        // Condition
+        // CONDITION
         item {
             Text(
                 text = weather.weather.firstOrNull()?.description?.replaceFirstChar {
@@ -179,13 +183,17 @@ private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
             )
         }
 
-        // Weather Details Card
+        // Weather Details Card (additional info)
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = if (isDay) {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.onBackground
+                    }
                 ),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 4.dp
@@ -199,15 +207,18 @@ private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
                 ) {
                     WeatherDetailItem(
                         label = "Humidity",
-                        value = "${weather.main.humidity}%"
+                        value = "${weather.main.humidity}%",
+                        isDay = isDay
                     )
                     WeatherDetailItem(
                         label = "Sunrise",
-                        value = formatTime(weather.sys.sunrise, weather.timezone)
+                        value = formatTime(weather.sys.sunrise, weather.timezone),
+                        isDay = isDay
                     )
                     WeatherDetailItem(
                         label = "Sunset",
-                        value = formatTime(weather.sys.sunset, weather.timezone)
+                        value = formatTime(weather.sys.sunset, weather.timezone),
+                        isDay = isDay
                     )
                 }
             }
@@ -219,21 +230,29 @@ private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
     }
 }
 @Composable
-private fun WeatherDetailItem(label: String, value: String) {
+private fun WeatherDetailItem(label: String, value: String, isDay: Boolean) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = label,
             fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            color = if (isDay){
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+            } else{
+                MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+            }
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = value,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = if (isDay){
+                MaterialTheme.colorScheme.onSurfaceVariant
+            } else{
+                MaterialTheme.colorScheme.onPrimary
+            }
         )
     }
 }

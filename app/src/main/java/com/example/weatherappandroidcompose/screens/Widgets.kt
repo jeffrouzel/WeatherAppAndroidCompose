@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.CloudQueue
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Thunderstorm
 import androidx.compose.material.icons.filled.WaterDrop
@@ -27,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherappandroidcompose.R
+import com.example.weatherappandroidcompose.api.OpenWeatherResponse
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -82,6 +84,7 @@ fun SearchBar(
     )
 }
 
+// TIME FORMATTER
 fun formatTime(timestamp: Long, timezoneOffset: Int): String {
     val date = Date(timestamp * 1000)
     val format = SimpleDateFormat("h:mm a", Locale.getDefault())
@@ -94,10 +97,9 @@ fun formatTime(timestamp: Long, timezoneOffset: Int): String {
     return format.format(date)
 }
 
-
 @Composable
-fun getWeatherIcon(condition: String, ) = when (condition.lowercase()) {
-    "clear" -> Icons.Default.WbSunny
+fun getWeatherIcon(condition: String, isDaytime: Boolean = true) = when (condition.lowercase()) {
+    "clear" -> if (isDaytime) Icons.Default.WbSunny else Icons.Default.DarkMode
     "clouds" -> Icons.Default.WbCloudy
     "rain", "drizzle" -> Icons.Default.WaterDrop
     "thunderstorm" -> Icons.Default.Thunderstorm
@@ -106,6 +108,16 @@ fun getWeatherIcon(condition: String, ) = when (condition.lowercase()) {
     else -> Icons.Default.CloudQueue // Default for unknown conditions
 }
 
+// DAY OR NIGHT CHECKER
+fun isDaytime(currentTime: Long, sunrise: Long, sunset: Long): Boolean {
+    return currentTime in sunrise..sunset
+}
+
+fun isDaytime(weather: OpenWeatherResponse): Boolean {
+    return isDaytime(weather.dt, weather.sys.sunrise, weather.sys.sunset)
+}
+
+////////////////////////////////////////////// Previews //////////////////////////////////////////////
 @Preview(showBackground = true)
 @Composable
 fun SearchBarPreview() {
