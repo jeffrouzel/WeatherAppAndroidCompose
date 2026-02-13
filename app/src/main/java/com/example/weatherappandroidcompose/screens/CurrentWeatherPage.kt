@@ -99,7 +99,13 @@ private fun CurrentWeatherContent(city: WeatherCity) {
             color = MaterialTheme.colorScheme.onBackground
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        // Feels Like
+        Text(
+            text = "Feels like ${city.temperature + 5}°C",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+        )
 
         // Weather Details Card
         Card(
