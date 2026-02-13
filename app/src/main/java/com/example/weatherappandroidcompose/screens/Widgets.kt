@@ -5,8 +5,15 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.CloudQueue
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Thunderstorm
+import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material.icons.filled.WbCloudy
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +27,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherappandroidcompose.R
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 @Composable
 fun SearchBar(
@@ -69,6 +80,30 @@ fun SearchBar(
             .fillMaxWidth()
             .heightIn(min = 56.dp)
     )
+}
+
+fun formatTime(timestamp: Long, timezoneOffset: Int): String {
+    val date = Date(timestamp * 1000)
+    val format = SimpleDateFormat("h:mm a", Locale.getDefault())
+
+    // Create a timezone with the offset from the API (in seconds)
+    val timezone = TimeZone.getTimeZone("GMT")
+    timezone.rawOffset = timezoneOffset * 1000 // Convert seconds to milliseconds
+    format.timeZone = timezone
+
+    return format.format(date)
+}
+
+
+@Composable
+fun getWeatherIcon(condition: String, ) = when (condition.lowercase()) {
+    "clear" -> Icons.Default.WbSunny
+    "clouds" -> Icons.Default.WbCloudy
+    "rain", "drizzle" -> Icons.Default.WaterDrop
+    "thunderstorm" -> Icons.Default.Thunderstorm
+    "snow" -> Icons.Default.AcUnit
+    "mist", "fog", "haze", "smoke", "dust", "sand", "ash" -> Icons.Default.Cloud
+    else -> Icons.Default.CloudQueue // Default for unknown conditions
 }
 
 @Preview(showBackground = true)

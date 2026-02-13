@@ -39,10 +39,11 @@ import com.example.weatherappandroidcompose.api.OpenWeatherResponse
 import com.example.weatherappandroidcompose.ui.theme.WeatherAppAndroidComposeTheme
 import com.example.weatherappandroidcompose.ui.theme.mainscreenBackgroundModifier
 import com.example.weatherappandroidcompose.viewmodel.WeatherUiState
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
+
+// Popular cities to show before any search
+private val popularCities = listOf("Tokyo", "Singapore", "Seoul", "Bangkok", "Hong Kong")
 
 @Composable
 fun WeatherListScreen(
@@ -53,79 +54,169 @@ fun WeatherListScreen(
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
 
-    Column(
+    LazyColumn(
         modifier = mainscreenBackgroundModifier()
     ) {
         // Search Bar with Button
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = { searchQuery = it },
-                modifier = Modifier.weight(1f)
-            )
-            Button(
-                onClick = {
-                    if (searchQuery.isNotBlank()) {
-                        onSearch(searchQuery)
-                        searchQuery = ""
-                    }
-                },
-                modifier = Modifier.height(56.dp)
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search city"
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = { searchQuery = it },
+                    modifier = Modifier.weight(1f)
                 )
+                Button(
+                    onClick = {
+                        if (searchQuery.isNotBlank()) {
+                            onSearch(searchQuery)
+                            searchQuery = ""
+                        }
+                    },
+                    modifier = Modifier.height(56.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search city"
+                    )
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         // Content based on UI state
         when (uiState) {
             is WeatherUiState.Loading -> {
-                LoadingContent()
+                item {
+                    LoadingContent()
+                }
             }
             is WeatherUiState.Success -> {
-                if (searchedCities.isEmpty()) {
-                    EmptyStateContent()
-                } else {
-                    // Show the current weather result
-                    WeatherResultCard(
-                        weather = uiState.weather,
-                        onClick = { onCitySelected(uiState.weather.name) }
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Show history of searched cities
-                    if (searchedCities.size > 1) {
-                        Text(
-                            text = "Search History",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.padding(vertical = 8.dp)
+                if (searchedCities.size < 2) {
+                    // Show popular cities when no search has been made
+                    item {
+                        PopularCitiesContent(
+                            onCitySelected = onCitySelected
                         )
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(searchedCities.filter { it != uiState.weather.name }) { city ->
-                                CityHistoryItem(
-                                    cityName = city,
-                                    onClick = { onCitySelected(city) }
-                                )
-                            }
+                    }
+                } else {
+                    // Show the current weather result card
+                    item {
+                        WeatherResultCard(
+                            weather = uiState.weather,
+                            onClick = { onCitySelected(uiState.weather.name) }
+                        )
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    // Show search history if there are previous searches
+                    if (searchedCities.size > 1) {
+                        item {
+                            Text(
+                                text = "Search History",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
+                        items(searchedCities.filter { it != uiState.weather.name }) { city ->
+                            CityHistoryItem(
+                                cityName = city,
+                                onClick = { onCitySelected(city) }
+                            )
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
             }
             is WeatherUiState.Error -> {
-                ErrorContent(message = uiState.message)
+                item {
+                    ErrorContent(message = uiState.message)
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun PopularCitiesContent(
+    onCitySelected: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            text = "Most Searched Cities",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+
+        Text(
+            text = "Tap any city to view its weather",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        popularCities.forEach { city ->
+            PopularCityCard(
+                cityName = city,
+                onClick = { onCitySelected(city) }
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+}
+
+@Composable
+private fun PopularCityCard(
+    cityName: String,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = cityName,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "View Weather →",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
@@ -148,37 +239,6 @@ private fun LoadingContent() {
                 text = "Searching for city...",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-            )
-        }
-    }
-}
-
-@Composable
-private fun EmptyStateContent() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp)
-        ) {
-            Text(
-                text = "🔍",
-                fontSize = 64.sp
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Search for a city",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Enter a city name above to view weather information",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                textAlign = TextAlign.Center
             )
         }
     }
@@ -269,15 +329,29 @@ private fun WeatherResultCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Weather Condition
-            Text(
-                text = weather.weather.firstOrNull()?.description?.replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-                } ?: "Unknown",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+
+            Row(horizontalArrangement = Arrangement.SpaceBetween){
+                val weatherIcon = getWeatherIcon(weather.weather.firstOrNull()?.main ?: "Clear")
+                Icon(
+                    imageVector = weatherIcon,
+                    contentDescription = "Weather condition",
+                    modifier = Modifier
+                        .size(32.dp)
+                        .padding(8.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+
+
+                // Weather Condition
+                Text(
+                    text = weather.weather.firstOrNull()?.description?.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+                    } ?: "Unknown",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -292,11 +366,11 @@ private fun WeatherResultCard(
                 )
                 WeatherInfoItem(
                     label = "Sunrise",
-                    value = formatTime(weather.sys.sunrise)
+                    value = formatTime(weather.sys.sunrise, weather.timezone)
                 )
                 WeatherInfoItem(
                     label = "Sunset",
-                    value = formatTime(weather.sys.sunset)
+                    value = formatTime(weather.sys.sunset, weather.timezone)
                 )
             }
         }
@@ -360,14 +434,6 @@ private fun WeatherInfoItem(label: String, value: String) {
         )
     }
 }
-
-// Helper function to format Unix timestamp to time
-private fun formatTime(timestamp: Long): String {
-    val date = Date(timestamp * 1000)
-    val format = SimpleDateFormat("h:mm a", Locale.getDefault())
-    return format.format(date)
-}
-
 ////////////////////////////////////////////// Previews //////////////////////////////////////////////
 
 @Preview(showBackground = true)

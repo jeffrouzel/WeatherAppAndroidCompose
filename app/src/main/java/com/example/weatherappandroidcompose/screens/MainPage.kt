@@ -32,8 +32,9 @@ fun MainScreen() {
     var searchedCities by rememberSaveable { mutableStateOf<List<String>>(listOf("Manila")) }
     var selectedCity by rememberSaveable { mutableStateOf("Manila") }
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchWeatherByCity("Manila")
+    // Fetch weather whenever selectedCity changes
+    LaunchedEffect(selectedCity) {
+        viewModel.fetchWeatherByCity(selectedCity)
     }
 
     Scaffold(
@@ -69,7 +70,6 @@ fun MainScreen() {
             composable("current_weather") {
                 CurrentWeatherScreen(
                     uiState = uiState,
-                    selectedCity = selectedCity
                 )
             }
             composable("weather_list") {
@@ -77,15 +77,17 @@ fun MainScreen() {
                     uiState = uiState,
                     searchedCities = searchedCities,
                     onSearch = { city ->
-                        viewModel.fetchWeatherByCity(city)
                         if (!searchedCities.contains(city)) {
                             searchedCities = searchedCities + city
                         }
                         selectedCity = city
                     },
                     onCitySelected = { city ->
+                        // Add city to search history if not already present
+                        if (!searchedCities.contains(city)) {
+                            searchedCities = searchedCities + city
+                        }
                         selectedCity = city
-                        viewModel.fetchWeatherByCity(city)
                         navController.navigate("current_weather") {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
