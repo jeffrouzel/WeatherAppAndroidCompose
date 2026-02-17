@@ -9,5 +9,6 @@ interface WeatherApi {
     fun getWeather(
         @Query("q") city: String,
         @Query("appid") apiKey: String,
+        @Query("units") units: String = "metric"  // Add this
     ): Call<OpenWeatherResponse>
 }

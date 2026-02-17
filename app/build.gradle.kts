@@ -82,4 +82,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     // Navigation
     implementation(libs.androidx.navigation.compose)
+    // Data Store
+    implementation(libs.androidx.datastore)
 }

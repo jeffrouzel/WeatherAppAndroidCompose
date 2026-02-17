@@ -22,6 +22,15 @@ class WeatherViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Loading)
     val uiState: StateFlow<WeatherUiState> = _uiState
 
+    private val _cityHistory = MutableStateFlow<List<String>>(listOf("Manila"))
+    val cityHistory: StateFlow<List<String>> = _cityHistory
+
+    fun addCityToHistory(city: String) {
+        if (!_cityHistory.value.contains(city)) {
+            _cityHistory.value = _cityHistory.value + city
+        }
+    }
+
     fun fetchWeatherByCity(city: String) {
         if (city.isBlank()) {
             _uiState.value = WeatherUiState.Error("Please enter a city name")
