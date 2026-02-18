@@ -33,12 +33,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherappandroidcompose.api.OpenWeatherResponse
-import com.example.weatherappandroidcompose.ui.theme.WeatherAppAndroidComposeTheme
 import com.example.weatherappandroidcompose.ui.theme.mainscreenBackgroundModifier
 import com.example.weatherappandroidcompose.viewmodel.WeatherUiState
 import java.util.Locale
@@ -263,42 +260,42 @@ private fun LoadingContent() {
     }
 }
 
-@Composable
-private fun ErrorContent(message: String,
-                         onRetry: () -> Unit
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp)
-        ) {
-            Text(
-                text = "⚠️",
-                fontSize = 64.sp
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Search Failed",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.error
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                textAlign = TextAlign.Center
-            )
-            Button(onClick = onRetry) {
-                Text("Retry")
-            }
-        }
-    }
-}
+//@Composable
+//private fun ErrorContent(message: String,
+//                         onRetry: () -> Unit
+//) {
+//    Box(
+//        modifier = Modifier.fillMaxSize(),
+//        contentAlignment = Alignment.Center
+//    ) {
+//        Column(
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            modifier = Modifier.padding(32.dp)
+//        ) {
+//            Text(
+//                text = "⚠️",
+//                fontSize = 64.sp
+//            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//            Text(
+//                text = "Search Failed",
+//                fontSize = 24.sp,
+//                fontWeight = FontWeight.Bold,
+//                color = MaterialTheme.colorScheme.error
+//            )
+//            Spacer(modifier = Modifier.height(8.dp))
+//            Text(
+//                text = message,
+//                style = MaterialTheme.typography.bodyLarge,
+//                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+//                textAlign = TextAlign.Center
+//            )
+//            Button(onClick = onRetry) {
+//                Text("Retry")
+//            }
+//        }
+//    }
+//}
 
 ////////////////////// RESULT CARD
 @Composable

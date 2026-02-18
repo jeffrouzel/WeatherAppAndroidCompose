@@ -1,5 +1,10 @@
 package com.example.weatherappandroidcompose.screens
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -67,13 +72,33 @@ fun MainScreen() {
             startDestination = "current_weather",
             modifier = Modifier.padding(paddingValues)
         ) {
-            composable("current_weather") {
+            composable(
+                route = "current_weather",
+                enterTransition = {
+                    slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(350)) +
+                            fadeIn(animationSpec = tween(350))
+                },
+                exitTransition = {
+                    slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(350)) +
+                            fadeOut(animationSpec = tween(350))
+                }
+            ) {
                 CurrentWeatherScreen(
                     uiState = uiState,
                     onRetry = { viewModel.fetchWeather(selectedCity) }
                 )
             }
-            composable("weather_list") {
+            composable(
+                route = "weather_list",
+                enterTransition = {
+                    slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(350)) +
+                            fadeIn(animationSpec = tween(350))
+                },
+                exitTransition = {
+                    slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(350)) +
+                            fadeOut(animationSpec = tween(350))
+                }
+            ) {
                 WeatherListScreen(
                     uiState = uiState,
                     searchedCities = cityHistory,

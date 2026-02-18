@@ -1,5 +1,11 @@
 package com.example.weatherappandroidcompose.screens
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,12 +28,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherappandroidcompose.api.OpenWeatherResponse
-import com.example.weatherappandroidcompose.ui.theme.WeatherAppAndroidComposeTheme
 import com.example.weatherappandroidcompose.ui.theme.mainscreenBackgroundModifier
 import com.example.weatherappandroidcompose.viewmodel.WeatherUiState
 import java.util.Locale
@@ -45,15 +47,25 @@ fun CurrentWeatherScreen(
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        when (uiState) {
-            is WeatherUiState.Loading -> {
-                LoadingState()
-            }
-            is WeatherUiState.Success -> {
-                CurrentWeatherContent(weather = uiState.weather)
-            }
-            is WeatherUiState.Error -> {
-                ErrorState(message = uiState.message, onRetry = onRetry)
+        AnimatedContent(
+            targetState = uiState,
+            transitionSpec = {
+                (fadeIn(animationSpec = tween(400)) +
+                        scaleIn(initialScale = 0.92f, animationSpec = tween(400))) togetherWith
+                        fadeOut(animationSpec = tween(200))
+            },
+            label = "WeatherStateAnimation"
+        ) { state ->
+            when (state) {
+                is WeatherUiState.Loading -> {
+                    LoadingState()
+                }
+                is WeatherUiState.Success -> {
+                    CurrentWeatherContent(weather = state.weather)
+                }
+                is WeatherUiState.Error -> {
+                    ErrorContent(message = state.message, onRetry = onRetry)
+                }
             }
         }
     }
@@ -78,37 +90,37 @@ private fun LoadingState() {
     }
 }
 
-@Composable
-private fun ErrorState(message: String, onRetry: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(32.dp)
-    ) {
-        Text(
-            text = "⚠️",
-            fontSize = 64.sp
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Error",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.error
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center
-        )
-        // ADD THIS:
-        Button(onClick = onRetry) {
-            Text("Retry")
-        }
-    }
-}
+//@Composable
+//private fun ErrorState(message: String, onRetry: () -> Unit) {
+//    Column(
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.Center,
+//        modifier = Modifier.padding(32.dp)
+//    ) {
+//        Text(
+//            text = "⚠️",
+//            fontSize = 64.sp
+//        )
+//        Spacer(modifier = Modifier.height(16.dp))
+//        Text(
+//            text = "Error",
+//            fontSize = 24.sp,
+//            fontWeight = FontWeight.Bold,
+//            color = MaterialTheme.colorScheme.error
+//        )
+//        Spacer(modifier = Modifier.height(8.dp))
+//        Text(
+//            text = message,
+//            style = MaterialTheme.typography.bodyLarge,
+//            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+//            textAlign = TextAlign.Center
+//        )
+//        // ADD THIS:
+//        Button(onClick = onRetry) {
+//            Text("Retry")
+//        }
+//    }
+//}
 
 @Composable
 private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
