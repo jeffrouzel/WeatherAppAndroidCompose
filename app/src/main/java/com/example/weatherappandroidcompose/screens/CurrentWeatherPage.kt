@@ -180,7 +180,7 @@ private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
 
         // Feels Like
         item {
-            val feelsLikeCelsius = (weather.main.feelsLike - 273.15).roundToInt()
+            val feelsLikeCelsius = (weather.main.feelsLike).roundToInt()
             Text(
                 text = "Feels like ${feelsLikeCelsius}°C",
                 fontSize = 16.sp,
