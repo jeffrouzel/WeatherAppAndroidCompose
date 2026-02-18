@@ -34,7 +34,7 @@ fun MainScreen() {
 
     // Fetch weather whenever selectedCity changes
     LaunchedEffect(selectedCity) {
-        viewModel.fetchWeatherByCity(selectedCity)
+        viewModel.fetchWeather(selectedCity)
     }
 
     Scaffold(
@@ -70,7 +70,7 @@ fun MainScreen() {
             composable("current_weather") {
                 CurrentWeatherScreen(
                     uiState = uiState,
-                    onRetry = { viewModel.fetchWeatherByCity(selectedCity) }
+                    onRetry = { viewModel.fetchWeather(selectedCity) }
                 )
             }
             composable("weather_list") {
@@ -92,7 +92,11 @@ fun MainScreen() {
                             restoreState = true
                         }
                     },
-                    onRetry = { viewModel.fetchWeatherByCity(selectedCity) }
+                    onClearHistory = {
+                        viewModel.clearCityHistory()
+                        selectedCity = "Manila"            // ADD THIS — fixes Bug 1
+                    },
+                    onRetry = { viewModel.fetchWeather(selectedCity) }
                 )
             }
         }
