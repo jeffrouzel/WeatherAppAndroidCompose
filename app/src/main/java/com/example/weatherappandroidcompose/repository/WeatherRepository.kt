@@ -45,9 +45,14 @@ class WeatherRepositoryImpl : WeatherRepository {
                         }
                     }
                 }
-
                 override fun onFailure(call: Call<OpenWeatherResponse>, t: Throwable) {
-                    onError("Network Error: ${t.message ?: "Unknown error"}")
+                    val message = when (t) {
+                        is java.net.UnknownHostException -> "No internet connection. Please check your network."
+                        is java.net.SocketTimeoutException -> "Connection timed out. Please try again."
+                        is java.io.IOException -> "Network error. Please check your connection."
+                        else -> "Something went wrong: ${t.message ?: "Unknown error"}"
+                    }
+                    onError(message)
                 }
             })
     }

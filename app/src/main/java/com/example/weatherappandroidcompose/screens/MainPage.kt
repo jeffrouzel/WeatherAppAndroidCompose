@@ -29,12 +29,12 @@ fun MainScreen() {
     val viewModel: WeatherViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    var searchedCities by rememberSaveable { mutableStateOf<List<String>>(listOf("Manila")) }
+    val cityHistory by viewModel.cityHistory.collectAsState()
     var selectedCity by rememberSaveable { mutableStateOf("Manila") }
 
     // Fetch weather whenever selectedCity changes
     LaunchedEffect(selectedCity) {
-        viewModel.fetchWeatherByCity(selectedCity)
+        viewModel.fetchWeather(selectedCity)
     }
 
     Scaffold(
@@ -70,20 +70,19 @@ fun MainScreen() {
             composable("current_weather") {
                 CurrentWeatherScreen(
                     uiState = uiState,
+                    onRetry = { viewModel.fetchWeather(selectedCity) }
                 )
             }
             composable("weather_list") {
                 WeatherListScreen(
                     uiState = uiState,
-                    searchedCities = searchedCities,
+                    searchedCities = cityHistory,
                     onSearch = { city ->
                         selectedCity = city
                     },
                     onCitySelected = { city ->
                         // Add city to search history if clicked
-                        if (!searchedCities.contains(city)) {
-                            searchedCities = searchedCities + city
-                        }
+                        viewModel.addCityToHistory(city)
                         selectedCity = city
                         navController.navigate("current_weather") {
                             popUpTo(navController.graph.startDestinationId) {
@@ -92,7 +91,12 @@ fun MainScreen() {
                             launchSingleTop = true
                             restoreState = true
                         }
-                    }
+                    },
+                    onClearHistory = {
+                        viewModel.clearCityHistory()
+                        selectedCity = "Manila"            // ADD THIS — fixes Bug 1
+                    },
+                    onRetry = { viewModel.fetchWeather(selectedCity) }
                 )
             }
         }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,6 +37,7 @@ import kotlin.math.roundToInt
 @Composable
 fun CurrentWeatherScreen(
     uiState: WeatherUiState,
+    onRetry: () -> Unit
 ) {
     Box(
         modifier = mainscreenBackgroundModifier()
@@ -51,7 +53,7 @@ fun CurrentWeatherScreen(
                 CurrentWeatherContent(weather = uiState.weather)
             }
             is WeatherUiState.Error -> {
-                ErrorState(message = uiState.message)
+                ErrorState(message = uiState.message, onRetry = onRetry)
             }
         }
     }
@@ -77,7 +79,7 @@ private fun LoadingState() {
 }
 
 @Composable
-private fun ErrorState(message: String) {
+private fun ErrorState(message: String, onRetry: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -101,6 +103,10 @@ private fun ErrorState(message: String) {
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             textAlign = TextAlign.Center
         )
+        // ADD THIS:
+        Button(onClick = onRetry) {
+            Text("Retry")
+        }
     }
 }
 
@@ -151,9 +157,9 @@ private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
 
         // TEMPERATURE (Convert from Kelvin to Celsius)
         item {
-            val tempCelsius = (weather.main.temp - 273.15).roundToInt()
+            val tempCelsius = (weather.main.temp).roundToInt()
             Text(
-                text = "${tempCelsius}°C",
+                text = "${tempCelsius}\u00B0C",
                 fontSize = 72.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -174,7 +180,7 @@ private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
 
         // Feels Like
         item {
-            val feelsLikeCelsius = (weather.main.feelsLike - 273.15).roundToInt()
+            val feelsLikeCelsius = (weather.main.feelsLike).roundToInt()
             Text(
                 text = "Feels like ${feelsLikeCelsius}°C",
                 fontSize = 16.sp,
@@ -259,22 +265,24 @@ private fun WeatherDetailItem(label: String, value: String, isDay: Boolean) {
 
 ////////////////////////////////////////////// Previews //////////////////////////////////////////////
 
-@Preview(showBackground = true)
-@Composable
-private fun CurrentWeatherScreenLoadingPreview() {
-    WeatherAppAndroidComposeTheme {
-        CurrentWeatherScreen(
-            uiState = WeatherUiState.Loading,
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun CurrentWeatherScreenErrorPreview() {
-    WeatherAppAndroidComposeTheme {
-        CurrentWeatherScreen(
-            uiState = WeatherUiState.Error("City not found. Please check spelling."),
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun CurrentWeatherScreenLoadingPreview() {
+//    WeatherAppAndroidComposeTheme {
+//        CurrentWeatherScreen(
+//            uiState = WeatherUiState.Loading,
+//            onRetry = { viewModel.fetchWeatherByCity(selectedCity) }
+//        )
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//private fun CurrentWeatherScreenErrorPreview() {
+//    WeatherAppAndroidComposeTheme {
+//        CurrentWeatherScreen(
+//            uiState = WeatherUiState.Error("City not found. Please check spelling."),
+//            onRetry = { viewModel.fetchWeatherByCity(selectedCity) }
+//        )
+//    }
+//}

@@ -15,12 +15,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,7 +52,9 @@ fun WeatherListScreen(
     uiState: WeatherUiState,
     searchedCities: List<String>,
     onSearch: (String) -> Unit,
-    onCitySelected: (String) -> Unit
+    onCitySelected: (String) -> Unit,
+    onClearHistory: () -> Unit,
+    onRetry: () -> Unit
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
 
@@ -121,12 +125,27 @@ fun WeatherListScreen(
                     // Show search history if there are previous searches
                     if (searchedCities.size > 1) {
                         item {
-                            Text(
-                                text = "Search History",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Search History",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                                IconButton(onClick = onClearHistory) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Clear history",
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            }
                         }
                         items(searchedCities.filter { it != uiState.weather.name }) { city ->
                             CityHistoryItem(
@@ -142,7 +161,7 @@ fun WeatherListScreen(
             }
             is WeatherUiState.Error -> {
                 item {
-                    ErrorContent(message = uiState.message)
+                    ErrorContent(message = uiState.message, onRetry = onRetry)
                 }
             }
         }
@@ -245,7 +264,9 @@ private fun LoadingContent() {
 }
 
 @Composable
-private fun ErrorContent(message: String) {
+private fun ErrorContent(message: String,
+                         onRetry: () -> Unit
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -272,6 +293,9 @@ private fun ErrorContent(message: String) {
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
             )
+            Button(onClick = onRetry) {
+                Text("Retry")
+            }
         }
     }
 }
@@ -333,7 +357,7 @@ private fun WeatherResultCard(
                     )
                 }
 
-                val tempCelsius = (weather.main.temp - 273.15).roundToInt()
+                val tempCelsius = (weather.main.temp).roundToInt()
                 Text(
                     text = "${tempCelsius}°C",
                     fontSize = 48.sp,
@@ -471,28 +495,28 @@ private fun CityHistoryItem(
 }
 ////////////////////////////////////////////// Previews //////////////////////////////////////////////
 
-@Preview(showBackground = true)
-@Composable
-private fun WeatherListScreenLoadingPreview() {
-    WeatherAppAndroidComposeTheme {
-        WeatherListScreen(
-            uiState = WeatherUiState.Loading,
-            searchedCities = emptyList(),
-            onSearch = {},
-            onCitySelected = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun WeatherListScreenEmptyPreview() {
-    WeatherAppAndroidComposeTheme {
-        WeatherListScreen(
-            uiState = WeatherUiState.Loading,
-            searchedCities = emptyList(),
-            onSearch = {},
-            onCitySelected = {}
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun WeatherListScreenLoadingPreview() {
+//    WeatherAppAndroidComposeTheme {
+//        WeatherListScreen(
+//            uiState = WeatherUiState.Loading,
+//            searchedCities = emptyList(),
+//            onSearch = {},
+//            onCitySelected = {}
+//        )
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//private fun WeatherListScreenEmptyPreview() {
+//    WeatherAppAndroidComposeTheme {
+//        WeatherListScreen(
+//            uiState = WeatherUiState.Loading,
+//            searchedCities = emptyList(),
+//            onSearch = {},
+//            onCitySelected = {}
+//        )
+//    }
+//}
