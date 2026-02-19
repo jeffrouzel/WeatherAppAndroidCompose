@@ -340,7 +340,7 @@ private fun WeatherResultCard(
 
                 val tempCelsius = (weather.main.temp).roundToInt()
                 Text(
-                    text = "${tempCelsius}°C",
+                    text = "${tempCelsius}\u00B0C",
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
