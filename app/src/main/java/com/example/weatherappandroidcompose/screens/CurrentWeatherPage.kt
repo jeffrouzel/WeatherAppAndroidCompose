@@ -31,6 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherappandroidcompose.api.OpenWeatherResponse
+import com.example.weatherappandroidcompose.ui.theme.daynightColor
+import com.example.weatherappandroidcompose.ui.theme.daynightColorAlpha
 import com.example.weatherappandroidcompose.ui.theme.mainscreenBackgroundModifier
 import com.example.weatherappandroidcompose.viewmodel.WeatherUiState
 import java.util.Locale
@@ -147,7 +149,7 @@ private fun CurrentWeatherContent(weather: OpenWeatherResponse) {
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = weather.sys.country,
+                    text = weather.sys.country ?: "",
                     fontSize = 20.sp,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                 )
@@ -255,22 +257,14 @@ private fun WeatherDetailItem(label: String, value: String, isDay: Boolean) {
         Text(
             text = label,
             fontSize = 14.sp,
-            color = if (isDay){
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-            } else{
-                MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
-            }
+            color = daynightColorAlpha(isDay)
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = value,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = if (isDay){
-                MaterialTheme.colorScheme.onSurfaceVariant
-            } else{
-                MaterialTheme.colorScheme.onPrimary
-            }
+            color = daynightColor(isDay)
         )
     }
 }

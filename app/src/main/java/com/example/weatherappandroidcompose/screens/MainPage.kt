@@ -35,6 +35,7 @@ fun MainScreen() {
     val uiState by viewModel.uiState.collectAsState()
 
     val cityHistory by viewModel.cityHistory.collectAsState()
+    var isSearchOnly by rememberSaveable { mutableStateOf(false) }
     var selectedCity by rememberSaveable { mutableStateOf("Manila") }
 
     // Fetch weather whenever selectedCity changes
@@ -102,11 +103,13 @@ fun MainScreen() {
                 WeatherListScreen(
                     uiState = uiState,
                     searchedCities = cityHistory,
+                    isSearchOnly = isSearchOnly,
                     onSearch = { city ->
+                        isSearchOnly = true
                         selectedCity = city
                     },
                     onCitySelected = { city ->
-                        // Add city to search history if clicked
+                        isSearchOnly = false
                         viewModel.addCityToHistory(city)
                         selectedCity = city
                         navController.navigate("current_weather") {
@@ -119,7 +122,8 @@ fun MainScreen() {
                     },
                     onClearHistory = {
                         viewModel.clearCityHistory()
-                        selectedCity = "Manila"            // ADD THIS — fixes Bug 1
+                        selectedCity = "Manila"
+                        isSearchOnly = false
                     },
                     onRetry = { viewModel.fetchWeather(selectedCity) }
                 )
