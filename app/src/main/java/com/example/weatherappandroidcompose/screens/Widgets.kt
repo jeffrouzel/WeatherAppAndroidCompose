@@ -97,14 +97,14 @@ fun SearchBar(
 // TIME FORMATTER
 fun formatTime(timestamp: Long, timezoneOffset: Int): String {
     val date = Date(timestamp * 1000)
-    val format = SimpleDateFormat("h:mm a", Locale.getDefault())
+    val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
 
     // Create a timezone with the offset from the API (in seconds)
     val timezone = TimeZone.getTimeZone("GMT")
     timezone.rawOffset = timezoneOffset * 1000 // Convert seconds to milliseconds
-    format.timeZone = timezone
+    formatter.timeZone = timezone
 
-    return format.format(date)
+    return formatter.format(date)
 }
 
 @Composable
