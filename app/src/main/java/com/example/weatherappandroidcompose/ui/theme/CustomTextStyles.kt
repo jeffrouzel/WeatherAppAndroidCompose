@@ -1,5 +1,7 @@
 package com.example.weatherappandroidcompose.ui.theme
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -51,3 +53,21 @@ val landingButtonTextStyle = TextStyle(
         blurRadius = 4f
     )
 )
+
+@Composable
+fun daynightColorAlpha(isDay: Boolean): Color {
+    return if (isDay){
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+    } else{
+        MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+    }
+}
+
+@Composable
+fun daynightColor(isDay: Boolean): Color {
+    return if (isDay){
+        MaterialTheme.colorScheme.onSurfaceVariant
+    } else{
+        MaterialTheme.colorScheme.onPrimary
+    }
+}

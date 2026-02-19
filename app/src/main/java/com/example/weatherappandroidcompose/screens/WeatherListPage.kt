@@ -33,12 +33,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherappandroidcompose.api.OpenWeatherResponse
-import com.example.weatherappandroidcompose.ui.theme.WeatherAppAndroidComposeTheme
+import com.example.weatherappandroidcompose.ui.theme.daynightColor
+import com.example.weatherappandroidcompose.ui.theme.daynightColorAlpha
 import com.example.weatherappandroidcompose.ui.theme.mainscreenBackgroundModifier
 import com.example.weatherappandroidcompose.viewmodel.WeatherUiState
 import java.util.Locale
@@ -51,6 +50,7 @@ private val popularCities = listOf("Tokyo", "New York", "Seoul", "Bangkok", "Hon
 fun WeatherListScreen(
     uiState: WeatherUiState,
     searchedCities: List<String>,
+    isSearchOnly: Boolean,
     onSearch: (String) -> Unit,
     onCitySelected: (String) -> Unit,
     onClearHistory: () -> Unit,
@@ -102,15 +102,8 @@ fun WeatherListScreen(
                 }
             }
             is WeatherUiState.Success -> {
-                if (searchedCities.size < 2) {
-                    // Show popular cities when no search has been made
-                    item {
-                        PopularCitiesContent(
-                            onCitySelected = onCitySelected
-                        )
-                    }
-                } else {
-                    // Show the current weather result card
+                // Show weather card if: we did a search-only fetch OR history has saved cities
+                if (isSearchOnly || searchedCities.size >= 2) {
                     item {
                         WeatherResultCard(
                             weather = uiState.weather,
@@ -118,17 +111,13 @@ fun WeatherListScreen(
                         )
                     }
 
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
+                    item { Spacer(modifier = Modifier.height(16.dp)) }
 
-                    // Show search history if there are previous searches
+                    // Only show history section if there are actually saved cities
                     if (searchedCities.size > 1) {
                         item {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -148,14 +137,14 @@ fun WeatherListScreen(
                             }
                         }
                         items(searchedCities.filter { it != uiState.weather.name }) { city ->
-                            CityHistoryItem(
-                                cityName = city,
-                                onClick = { onCitySelected(city) }
-                            )
+                            CityHistoryItem(cityName = city, onClick = { onCitySelected(city) })
                         }
-                        item {
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
+                        item { Spacer(modifier = Modifier.height(8.dp)) }
+                    }
+                } else {
+                    // No search yet and only default city in history — show popular cities
+                    item {
+                        PopularCitiesContent(onCitySelected = onCitySelected)
                     }
                 }
             }
@@ -263,42 +252,42 @@ private fun LoadingContent() {
     }
 }
 
-@Composable
-private fun ErrorContent(message: String,
-                         onRetry: () -> Unit
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp)
-        ) {
-            Text(
-                text = "⚠️",
-                fontSize = 64.sp
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Search Failed",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.error
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                textAlign = TextAlign.Center
-            )
-            Button(onClick = onRetry) {
-                Text("Retry")
-            }
-        }
-    }
-}
+//@Composable
+//private fun ErrorContent(message: String,
+//                         onRetry: () -> Unit
+//) {
+//    Box(
+//        modifier = Modifier.fillMaxSize(),
+//        contentAlignment = Alignment.Center
+//    ) {
+//        Column(
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            modifier = Modifier.padding(32.dp)
+//        ) {
+//            Text(
+//                text = "⚠️",
+//                fontSize = 64.sp
+//            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//            Text(
+//                text = "Search Failed",
+//                fontSize = 24.sp,
+//                fontWeight = FontWeight.Bold,
+//                color = MaterialTheme.colorScheme.error
+//            )
+//            Spacer(modifier = Modifier.height(8.dp))
+//            Text(
+//                text = message,
+//                style = MaterialTheme.typography.bodyLarge,
+//                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+//                textAlign = TextAlign.Center
+//            )
+//            Button(onClick = onRetry) {
+//                Text("Retry")
+//            }
+//        }
+//    }
+//}
 
 ////////////////////// RESULT CARD
 @Composable
@@ -340,20 +329,12 @@ private fun WeatherResultCard(
                         text = weather.name,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (isDay){
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        } else{
-                            MaterialTheme.colorScheme.onPrimary
-                        }
+                        color = daynightColor(isDay)
                     )
                     Text(
-                        text = weather.sys.country,
+                        text = weather.sys.country ?: "",
                         fontSize = 14.sp,
-                        color = if (isDay){
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                        } else{
-                            MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
-                        }
+                        color = daynightColorAlpha(isDay)
                     )
                 }
 
@@ -393,11 +374,7 @@ private fun WeatherResultCard(
                     } ?: "Unknown",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
-                    color = if (isDay){
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    } else{
-                        MaterialTheme.colorScheme.onPrimary
-                    }
+                    color = daynightColor(isDay)
                 )
             }
 
@@ -436,21 +413,13 @@ private fun WeatherInfoItem(label: String, value: String, isDay: Boolean) {
         Text(
             text = label,
             fontSize = 12.sp,
-            color = if (isDay){
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-            } else{
-                MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
-            }
+            color = daynightColorAlpha(isDay)
         )
         Text(
             text = value,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
-            color = if (isDay){
-                MaterialTheme.colorScheme.onSurfaceVariant
-            } else{
-                MaterialTheme.colorScheme.onPrimary
-            }
+            color = daynightColor(isDay)
         )
     }
 }

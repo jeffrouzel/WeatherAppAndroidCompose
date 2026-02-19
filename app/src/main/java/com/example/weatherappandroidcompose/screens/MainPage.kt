@@ -1,5 +1,10 @@
 package com.example.weatherappandroidcompose.screens
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -30,6 +35,7 @@ fun MainScreen() {
     val uiState by viewModel.uiState.collectAsState()
 
     val cityHistory by viewModel.cityHistory.collectAsState()
+    var isSearchOnly by rememberSaveable { mutableStateOf(false) }
     var selectedCity by rememberSaveable { mutableStateOf("Manila") }
 
     // Fetch weather whenever selectedCity changes
@@ -67,21 +73,43 @@ fun MainScreen() {
             startDestination = "current_weather",
             modifier = Modifier.padding(paddingValues)
         ) {
-            composable("current_weather") {
+            composable(
+                route = "current_weather",
+                enterTransition = {
+                    slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(350)) +
+                            fadeIn(animationSpec = tween(350))
+                },
+                exitTransition = {
+                    slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(350)) +
+                            fadeOut(animationSpec = tween(350))
+                }
+            ) {
                 CurrentWeatherScreen(
                     uiState = uiState,
                     onRetry = { viewModel.fetchWeather(selectedCity) }
                 )
             }
-            composable("weather_list") {
+            composable(
+                route = "weather_list",
+                enterTransition = {
+                    slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(350)) +
+                            fadeIn(animationSpec = tween(350))
+                },
+                exitTransition = {
+                    slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(350)) +
+                            fadeOut(animationSpec = tween(350))
+                }
+            ) {
                 WeatherListScreen(
                     uiState = uiState,
                     searchedCities = cityHistory,
+                    isSearchOnly = isSearchOnly,
                     onSearch = { city ->
+                        isSearchOnly = true
                         selectedCity = city
                     },
                     onCitySelected = { city ->
-                        // Add city to search history if clicked
+                        isSearchOnly = false
                         viewModel.addCityToHistory(city)
                         selectedCity = city
                         navController.navigate("current_weather") {
@@ -94,7 +122,8 @@ fun MainScreen() {
                     },
                     onClearHistory = {
                         viewModel.clearCityHistory()
-                        selectedCity = "Manila"            // ADD THIS — fixes Bug 1
+                        selectedCity = "Manila"
+                        isSearchOnly = false
                     },
                     onRetry = { viewModel.fetchWeather(selectedCity) }
                 )
